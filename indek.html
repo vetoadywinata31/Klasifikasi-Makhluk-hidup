@@ -1,0 +1,546 @@
+import React, { useState } from 'react';
+import { 
+  Leaf, 
+  BookOpen, 
+  Layers, 
+  CheckCircle, 
+  Home, 
+  ChevronRight, 
+  Activity,
+  Wind,
+  Utensils,
+  Maximize,
+  Baby,
+  Eye,
+  Trash2,
+  Award,
+  RefreshCcw
+} from 'lucide-react';
+
+// --- DATA MATERI ---
+const ciriCiriData = [
+  { title: 'Bernapas (Respirasi)', icon: <Wind className="w-8 h-8 text-blue-500" />, desc: 'Menghirup oksigen (O2) dan mengeluarkan karbon dioksida (CO2) untuk menghasilkan energi.' },
+  { title: 'Memerlukan Nutrisi', icon: <Utensils className="w-8 h-8 text-orange-500" />, desc: 'Membutuhkan makanan dan air untuk sumber energi, pertumbuhan, dan perbaikan sel tubuh.' },
+  { title: 'Bergerak', icon: <Activity className="w-8 h-8 text-green-500" />, desc: 'Mampu memindahkan posisi seluruh atau sebagian tubuhnya. Tumbuhan bergerak secara pasif.' },
+  { title: 'Tumbuh & Berkembang', icon: <Maximize className="w-8 h-8 text-purple-500" />, desc: 'Bertambahnya ukuran/volume (pertumbuhan) dan menuju kedewasaan (perkembangan).' },
+  { title: 'Berkembang Biak', icon: <Baby className="w-8 h-8 text-pink-500" />, desc: 'Reproduksi untuk menghasilkan keturunan agar jenisnya tidak punah.' },
+  { title: 'Peka Terhadap Rangsang', icon: <Eye className="w-8 h-8 text-yellow-500" />, desc: 'Kemampuan menanggapi rangsangan dari lingkungan (iritabilitas), seperti cahaya atau sentuhan.' },
+  { title: 'Mengeluarkan Zat Sisa', icon: <Trash2 className="w-8 h-8 text-gray-500" />, desc: 'Proses ekskresi untuk membuang zat sisa metabolisme yang beracun bagi tubuh (keringat, urine, dll).' },
+];
+
+const kingdomData = [
+  {
+    name: 'Monera',
+    color: 'bg-blue-100 border-blue-400',
+    textColor: 'text-blue-800',
+    desc: 'Makhluk hidup bersel satu (uniseluler) yang tidak memiliki membran inti sel (prokariotik).',
+    examples: 'Bakteri (Escherichia coli, Lactobacillus) dan Alga Biru (Cyanobacteria).'
+  },
+  {
+    name: 'Protista',
+    color: 'bg-yellow-100 border-yellow-400',
+    textColor: 'text-yellow-800',
+    desc: 'Makhluk hidup bersel satu atau banyak yang sudah memiliki membran inti (eukariotik), namun belum memiliki jaringan yang jelas.',
+    examples: 'Amoeba, Paramecium, Euglena, dan berbagai jenis Alga (ganggang).'
+  },
+  {
+    name: 'Fungi (Jamur)',
+    color: 'bg-purple-100 border-purple-400',
+    textColor: 'text-purple-800',
+    desc: 'Memiliki membran inti (eukariotik), dinding sel dari kitin, tidak memiliki klorofil (heterotrof/tidak bisa berfotosintesis).',
+    examples: 'Jamur merang, jamur roti (Rhizopus), ragi (Saccharomyces).'
+  },
+  {
+    name: 'Plantae (Tumbuhan)',
+    color: 'bg-green-100 border-green-400',
+    textColor: 'text-green-800',
+    desc: 'Multiseluler, eukariotik, memiliki klorofil untuk fotosintesis (autotrof), dan berdinding sel dari selulosa.',
+    examples: 'Tumbuhan lumut, tumbuhan paku, dan tumbuhan berbiji (mangga, padi, pinus).'
+  },
+  {
+    name: 'Animalia (Hewan)',
+    color: 'bg-red-100 border-red-400',
+    textColor: 'text-red-800',
+    desc: 'Multiseluler, eukariotik, tidak berdinding sel, tidak berklorofil (heterotrof), dan umumnya dapat bergerak aktif.',
+    examples: 'Vertebrata (ikan, burung, mamalia) dan Avertebrata (serangga, cacing, siput).'
+  }
+];
+
+const quizQuestions = [
+  {
+    question: 'Tujuan utama dari klasifikasi makhluk hidup adalah...',
+    options: [
+      'Memberi nama setiap makhluk hidup yang baru ditemukan',
+      'Mempermudah mengenali, membandingkan, dan mempelajari makhluk hidup',
+      'Mencari perbedaan antara hewan dan tumbuhan',
+      'Melestarikan makhluk hidup langka'
+    ],
+    answer: 1
+  },
+  {
+    question: 'Makhluk hidup memiliki ciri peka terhadap rangsang. Istilah biologi untuk ciri ini adalah...',
+    options: ['Ekskresi', 'Respirasi', 'Iritabilitas', 'Reproduksi'],
+    answer: 2
+  },
+  {
+    question: 'Urutan taksonomi pada tumbuhan dari tingkat yang paling tinggi ke yang paling rendah adalah...',
+    options: [
+      'Kingdom - Divisi - Kelas - Ordo - Famili - Genus - Spesies',
+      'Kingdom - Filum - Kelas - Ordo - Famili - Genus - Spesies',
+      'Spesies - Genus - Famili - Ordo - Kelas - Divisi - Kingdom',
+      'Kingdom - Divisi - Ordo - Kelas - Famili - Genus - Spesies'
+    ],
+    answer: 0
+  },
+  {
+    question: 'Bakteri termasuk ke dalam kingdom Monera karena memiliki ciri utama, yaitu...',
+    options: [
+      'Memiliki klorofil',
+      'Bersel banyak (multiseluler)',
+      'Tidak memiliki membran inti sel (Prokariotik)',
+      'Memiliki membran inti sel (Eukariotik)'
+    ],
+    answer: 2
+  },
+  {
+    question: 'Jamur (Fungi) dipisahkan dari kingdom Plantae (Tumbuhan) dengan alasan utama...',
+    options: [
+      'Jamur tidak dapat bergerak',
+      'Jamur berkembang biak dengan spora',
+      'Jamur tidak memiliki klorofil sehingga bersifat heterotrof',
+      'Jamur merupakan makhluk hidup uniseluler'
+    ],
+    answer: 2
+  }
+];
+
+export default function App() {
+  const [activeTab, setActiveTab] = useState('home');
+
+  const renderContent = () => {
+    switch (activeTab) {
+      case 'home': return <HomeSection setTab={setActiveTab} />;
+      case 'ciri': return <CiriCiriSection />;
+      case 'takson': return <TaksonSection />;
+      case 'kingdom': return <KingdomSection />;
+      case 'quiz': return <QuizSection />;
+      default: return <HomeSection setTab={setActiveTab} />;
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-slate-50 font-sans text-slate-800">
+      {/* Header / Navbar */}
+      <nav className="bg-emerald-600 text-white shadow-lg sticky top-0 z-50">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="flex justify-between items-center py-4">
+            <div className="flex items-center space-x-2">
+              <Leaf className="w-8 h-8 text-emerald-200" />
+              <span className="font-bold text-xl tracking-wide hidden sm:block">Biologi Kelas 7</span>
+              <span className="font-bold text-xl tracking-wide sm:hidden">Bio 7</span>
+            </div>
+            
+            {/* Desktop Menu */}
+            <div className="hidden md:flex space-x-1">
+              <NavButton active={activeTab === 'home'} onClick={() => setActiveTab('home')} icon={<Home className="w-4 h-4"/>} text="Beranda" />
+              <NavButton active={activeTab === 'ciri'} onClick={() => setActiveTab('ciri')} icon={<Activity className="w-4 h-4"/>} text="Ciri-ciri" />
+              <NavButton active={activeTab === 'takson'} onClick={() => setActiveTab('takson')} icon={<Layers className="w-4 h-4"/>} text="Takson" />
+              <NavButton active={activeTab === 'kingdom'} onClick={() => setActiveTab('kingdom')} icon={<BookOpen className="w-4 h-4"/>} text="5 Kingdom" />
+              <NavButton active={activeTab === 'quiz'} onClick={() => setActiveTab('quiz')} icon={<CheckCircle className="w-4 h-4"/>} text="Kuis" isAccent={true} />
+            </div>
+
+            {/* Mobile Menu Dropdown (Simple) */}
+            <div className="md:hidden">
+              <select 
+                value={activeTab}
+                onChange={(e) => setActiveTab(e.target.value)}
+                className="bg-emerald-700 text-white border-none rounded p-2 text-sm focus:ring-2 focus:ring-emerald-300"
+              >
+                <option value="home">Beranda</option>
+                <option value="ciri">Ciri-ciri</option>
+                <option value="takson">Urutan Takson</option>
+                <option value="kingdom">5 Kingdom</option>
+                <option value="quiz">Kuis Interaktif</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      {/* Main Content Area */}
+      <main className="max-w-6xl mx-auto p-4 sm:p-6 lg:p-8 animate-fadeIn">
+        {renderContent()}
+      </main>
+      
+      {/* Footer */}
+      <footer className="text-center py-6 text-slate-500 text-sm mt-8 border-t">
+        <p>© {new Date().getFullYear()} - Media Pembelajaran Interaktif IPA SMP</p>
+      </footer>
+    </div>
+  );
+}
+
+// --- KOMPONEN BANTUAN ---
+
+const NavButton = ({ active, onClick, icon, text, isAccent = false }) => (
+  <button
+    onClick={onClick}
+    className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all font-medium ${
+      active 
+        ? 'bg-white text-emerald-700 shadow-sm' 
+        : isAccent 
+          ? 'bg-yellow-400 text-emerald-900 hover:bg-yellow-300' 
+          : 'hover:bg-emerald-500 text-emerald-50'
+    }`}
+  >
+    {icon}
+    <span>{text}</span>
+  </button>
+);
+
+const SectionTitle = ({ title, subtitle, icon }) => (
+  <div className="text-center mb-10">
+    <div className="flex justify-center mb-3 text-emerald-600">
+      {icon}
+    </div>
+    <h2 className="text-3xl font-bold text-slate-800 mb-2">{title}</h2>
+    <p className="text-slate-500 max-w-2xl mx-auto">{subtitle}</p>
+  </div>
+);
+
+
+// --- KOMPONEN HALAMAN ---
+
+const HomeSection = ({ setTab }) => (
+  <div className="flex flex-col items-center justify-center min-h-[70vh] text-center px-4">
+    <div className="bg-emerald-100 p-6 rounded-full mb-6 shadow-inner">
+      <Leaf className="w-20 h-20 text-emerald-600" />
+    </div>
+    <h1 className="text-4xl md:text-5xl font-extrabold text-slate-800 mb-4 leading-tight">
+      Klasifikasi Makhluk Hidup
+    </h1>
+    <p className="text-lg text-slate-600 max-w-2xl mb-8 leading-relaxed">
+      Selamat datang di Media Pembelajaran Interaktif IPA Kelas 7. Mari kita pelajari 
+      bagaimana para ilmuwan mengelompokkan keanekaragaman hayati yang luar biasa di bumi kita ini.
+    </p>
+    <div className="flex flex-col sm:flex-row gap-4">
+      <button 
+        onClick={() => setTab('ciri')}
+        className="px-8 py-3 bg-emerald-600 text-white rounded-full font-bold shadow-lg hover:bg-emerald-700 hover:-translate-y-1 transition-all flex items-center justify-center space-x-2"
+      >
+        <span>Mulai Belajar</span>
+        <ChevronRight className="w-5 h-5" />
+      </button>
+      <button 
+        onClick={() => setTab('quiz')}
+        className="px-8 py-3 bg-white text-emerald-700 border-2 border-emerald-600 rounded-full font-bold shadow-lg hover:bg-emerald-50 hover:-translate-y-1 transition-all flex items-center justify-center space-x-2"
+      >
+        <span>Langsung Kuis</span>
+        <Activity className="w-5 h-5" />
+      </button>
+    </div>
+  </div>
+);
+
+
+const CiriCiriSection = () => (
+  <div>
+    <SectionTitle 
+      title="Ciri-ciri Makhluk Hidup" 
+      subtitle="Benda mati dan makhluk hidup dapat dibedakan melalui ciri-ciri kehidupan berikut ini."
+      icon={<Activity className="w-12 h-12" />}
+    />
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {ciriCiriData.map((item, index) => (
+        <div key={index} className="bg-white p-6 rounded-xl shadow-md border-t-4 border-emerald-500 hover:shadow-xl transition-all">
+          <div className="bg-slate-50 w-16 h-16 rounded-full flex items-center justify-center mb-4">
+            {item.icon}
+          </div>
+          <h3 className="text-xl font-bold mb-2 text-slate-700">{item.title}</h3>
+          <p className="text-slate-600 text-sm leading-relaxed">{item.desc}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+);
+
+
+const TaksonSection = () => (
+  <div>
+    <SectionTitle 
+      title="Urutan Taksonomi" 
+      subtitle="Takson adalah tingkatan pengelompokan makhluk hidup dari kelompok terbesar hingga kelompok terkecil (spesies)."
+      icon={<Layers className="w-12 h-12" />}
+    />
+    
+    <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col md:flex-row">
+      {/* Visual Pyramid concept */}
+      <div className="md:w-1/2 p-8 bg-emerald-50 flex flex-col justify-center items-center relative">
+        <h3 className="text-xl font-bold text-emerald-800 mb-6 text-center">Tingkatan Takson</h3>
+        
+        <div className="w-full flex flex-col items-center space-y-1">
+          {/* Pyramid levels */}
+          <div className="w-full bg-emerald-700 text-white py-2 text-center rounded text-sm font-bold shadow-sm">Kingdom (Kerajaan)</div>
+          <div className="w-11/12 bg-emerald-600 text-white py-2 text-center rounded text-sm font-bold shadow-sm">Filum / Divisio (Keluarga Besar)</div>
+          <div className="w-10/12 bg-emerald-500 text-white py-2 text-center rounded text-sm font-bold shadow-sm">Classis (Kelas)</div>
+          <div className="w-9/12 bg-emerald-400 text-emerald-900 py-2 text-center rounded text-sm font-bold shadow-sm">Ordo (Bangsa)</div>
+          <div className="w-8/12 bg-emerald-300 text-emerald-900 py-2 text-center rounded text-sm font-bold shadow-sm">Familia (Suku)</div>
+          <div className="w-7/12 bg-emerald-200 text-emerald-900 py-2 text-center rounded text-sm font-bold shadow-sm">Genus (Marga)</div>
+          <div className="w-6/12 bg-emerald-100 text-emerald-900 py-2 text-center rounded text-sm font-bold border border-emerald-300 shadow-sm">Species (Jenis)</div>
+        </div>
+        
+        <div className="absolute left-4 top-1/2 -translate-y-1/2 flex flex-col items-center space-y-2 text-xs text-emerald-600 font-medium">
+          <span>Lebih Banyak Anggota</span>
+          <div className="h-24 w-px bg-emerald-400"></div>
+          <span>Persamaan Lebih Sedikit</span>
+        </div>
+      </div>
+      
+      {/* Explanations */}
+      <div className="md:w-1/2 p-8">
+        <h3 className="text-xl font-bold text-slate-800 mb-4">Aturan Penamaan</h3>
+        <p className="text-slate-600 mb-6 text-sm">
+          Dalam Biologi, filum digunakan untuk Hewan, sedangkan Divisi (Divisio) digunakan untuk Tumbuhan. 
+          Semakin ke bawah (menuju spesies), jumlah anggota semakin sedikit namun ciri-ciri persamaannya semakin banyak.
+        </p>
+        
+        <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-r-lg">
+          <h4 className="font-bold text-yellow-800 mb-1">Tata Nama Binomial Nomenklatur</h4>
+          <p className="text-sm text-yellow-900 mb-2">Aturan penamaan spesies oleh Carolus Linnaeus:</p>
+          <ul className="text-sm text-yellow-800 list-disc list-inside space-y-1">
+            <li>Terdiri dari dua kata bahasa Latin.</li>
+            <li>Kata pertama menunjukkan Genus (diawali huruf kapital).</li>
+            <li>Kata kedua menunjukkan penunjuk Spesies (huruf kecil).</li>
+            <li>Dicetak miring (italic) atau digarisbawahi secara terpisah.</li>
+          </ul>
+          <div className="mt-3 p-2 bg-white rounded text-center font-mono font-bold italic text-slate-700">
+            Zea mays <span className="font-sans text-xs font-normal text-slate-500 not-italic">(Jagung)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
+
+const KingdomSection = () => {
+  const [activeK, setActiveK] = useState(0);
+
+  return (
+    <div>
+      <SectionTitle 
+        title="Sistem 5 Kingdom" 
+        subtitle="R.H. Whittaker mengelompokkan makhluk hidup ke dalam 5 kelompok besar (Kingdom) berdasarkan susunan sel, cara makan, dan tingkat perkembangannya."
+        icon={<BookOpen className="w-12 h-12" />}
+      />
+
+      <div className="flex flex-col lg:flex-row gap-6 max-w-5xl mx-auto">
+        {/* Sidebar Tabs */}
+        <div className="flex lg:flex-col overflow-x-auto lg:overflow-visible gap-2 lg:w-1/3 hide-scrollbar pb-2 lg:pb-0">
+          {kingdomData.map((k, idx) => (
+            <button
+              key={idx}
+              onClick={() => setActiveK(idx)}
+              className={`text-left px-5 py-4 rounded-xl font-bold transition-all whitespace-nowrap lg:whitespace-normal border-2 ${
+                activeK === idx 
+                  ? `${k.color} shadow-md scale-[1.02]` 
+                  : 'bg-white border-slate-100 text-slate-500 hover:bg-slate-50'
+              }`}
+            >
+              {idx + 1}. Kingdom {k.name}
+            </button>
+          ))}
+        </div>
+
+        {/* Content Area */}
+        <div className="lg:w-2/3">
+          <div className={`p-8 rounded-2xl border-2 ${kingdomData[activeK].color} bg-white shadow-lg h-full transition-all duration-300`}>
+            <div className="flex justify-between items-start mb-6">
+              <h3 className={`text-3xl font-extrabold ${kingdomData[activeK].textColor}`}>
+                Kingdom {kingdomData[activeK].name}
+              </h3>
+              <div className={`w-12 h-12 rounded-full flex items-center justify-center text-2xl font-bold bg-white shadow ${kingdomData[activeK].textColor}`}>
+                {activeK + 1}
+              </div>
+            </div>
+            
+            <div className="space-y-6">
+              <div>
+                <h4 className="font-bold text-slate-700 mb-2 uppercase text-sm tracking-wider">Ciri-ciri Utama</h4>
+                <p className="text-slate-600 leading-relaxed text-lg">
+                  {kingdomData[activeK].desc}
+                </p>
+              </div>
+              
+              <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                <h4 className="font-bold text-slate-700 mb-2 uppercase text-sm tracking-wider flex items-center gap-2">
+                  <Leaf className="w-4 h-4 text-emerald-500"/>
+                  Contoh Makhluk Hidup
+                </h4>
+                <p className="text-slate-700 font-medium italic">
+                  {kingdomData[activeK].examples}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+
+const QuizSection = () => {
+  const [currentQ, setCurrentQ] = useState(0);
+  const [score, setScore] = useState(0);
+  const [showResult, setShowResult] = useState(false);
+  const [selectedOpt, setSelectedOpt] = useState(null);
+  const [isAnswered, setIsAnswered] = useState(false);
+
+  const handleAnswer = (optIdx) => {
+    if (isAnswered) return;
+    
+    setSelectedOpt(optIdx);
+    setIsAnswered(true);
+
+    if (optIdx === quizQuestions[currentQ].answer) {
+      setScore(score + 20); // 5 questions * 20 = 100 max score
+    }
+  };
+
+  const nextQuestion = () => {
+    if (currentQ < quizQuestions.length - 1) {
+      setCurrentQ(currentQ + 1);
+      setSelectedOpt(null);
+      setIsAnswered(false);
+    } else {
+      setShowResult(true);
+    }
+  };
+
+  const restartQuiz = () => {
+    setCurrentQ(0);
+    setScore(0);
+    setShowResult(false);
+    setSelectedOpt(null);
+    setIsAnswered(false);
+  };
+
+  if (showResult) {
+    return (
+      <div className="max-w-2xl mx-auto bg-white p-8 rounded-2xl shadow-xl text-center">
+        <Award className={`w-24 h-24 mx-auto mb-4 ${score > 70 ? 'text-yellow-400' : 'text-slate-400'}`} />
+        <h2 className="text-3xl font-bold text-slate-800 mb-2">Kuis Selesai!</h2>
+        <p className="text-slate-600 mb-6">Kamu telah menyelesaikan latihan soal klasifikasi makhluk hidup.</p>
+        
+        <div className="bg-emerald-50 border-2 border-emerald-200 p-6 rounded-xl mb-8 inline-block">
+          <p className="text-sm text-emerald-800 font-bold uppercase mb-1">Nilai Kamu</p>
+          <p className="text-5xl font-black text-emerald-600">{score} <span className="text-2xl text-emerald-400">/ 100</span></p>
+        </div>
+        
+        <p className="text-lg font-medium text-slate-700 mb-8">
+          {score === 100 ? 'Sempurna! Kamu sangat paham materi ini. 🌟' : 
+           score >= 60 ? 'Bagus! Pelajari lagi bagian yang salah ya. 👍' : 
+           'Jangan menyerah! Mari baca materi lagi dan coba kembali. 💪'}
+        </p>
+
+        <button 
+          onClick={restartQuiz}
+          className="flex items-center justify-center space-x-2 mx-auto px-6 py-3 bg-emerald-600 text-white rounded-full font-bold hover:bg-emerald-700 transition"
+        >
+          <RefreshCcw className="w-5 h-5" />
+          <span>Ulangi Kuis</span>
+        </button>
+      </div>
+    );
+  }
+
+  const q = quizQuestions[currentQ];
+
+  return (
+    <div className="max-w-3xl mx-auto">
+      <SectionTitle 
+        title="Kuis Evaluasi" 
+        subtitle="Uji pemahamanmu tentang materi yang telah dipelajari."
+        icon={<CheckCircle className="w-12 h-12" />}
+      />
+
+      <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+        {/* Progress Bar */}
+        <div className="w-full bg-slate-100 h-2">
+          <div 
+            className="bg-emerald-500 h-2 transition-all duration-300" 
+            style={{ width: `${((currentQ) / quizQuestions.length) * 100}%` }}
+          ></div>
+        </div>
+        
+        <div className="p-8">
+          <div className="flex justify-between items-center mb-6">
+            <span className="text-sm font-bold text-slate-400 uppercase tracking-wider">
+              Soal {currentQ + 1} dari {quizQuestions.length}
+            </span>
+            <span className="text-sm font-bold text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full">
+              Skor: {score}
+            </span>
+          </div>
+
+          <h3 className="text-xl font-bold text-slate-800 mb-6 leading-relaxed">
+            {q.question}
+          </h3>
+
+          <div className="space-y-3 mb-8">
+            {q.options.map((opt, idx) => {
+              let btnClass = "w-full text-left p-4 rounded-xl border-2 transition-all ";
+              
+              if (!isAnswered) {
+                btnClass += "border-slate-200 hover:border-emerald-400 hover:bg-emerald-50 text-slate-700";
+              } else {
+                if (idx === q.answer) {
+                  // Correct answer gets green
+                  btnClass += "border-green-500 bg-green-50 text-green-800 font-bold";
+                } else if (idx === selectedOpt && idx !== q.answer) {
+                  // Wrong selected answer gets red
+                  btnClass += "border-red-400 bg-red-50 text-red-700";
+                } else {
+                  // Unselected wrong answers get muted
+                  btnClass += "border-slate-100 bg-slate-50 text-slate-400 opacity-50";
+                }
+              }
+
+              return (
+                <button
+                  key={idx}
+                  disabled={isAnswered}
+                  onClick={() => handleAnswer(idx)}
+                  className={btnClass}
+                >
+                  <div className="flex items-center space-x-3">
+                    <div className={`w-6 h-6 flex-shrink-0 rounded-full border-2 flex items-center justify-center text-xs
+                      ${isAnswered && idx === q.answer ? 'border-green-500 bg-green-500 text-white' : 
+                        isAnswered && idx === selectedOpt ? 'border-red-400 bg-red-400 text-white' : 'border-slate-300'}
+                    `}>
+                      {['A', 'B', 'C', 'D'][idx]}
+                    </div>
+                    <span>{opt}</span>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+
+          {isAnswered && (
+            <div className="flex justify-end animate-fadeIn">
+              <button 
+                onClick={nextQuestion}
+                className="px-6 py-2 bg-emerald-600 text-white rounded-lg font-bold hover:bg-emerald-700 flex items-center space-x-2"
+              >
+                <span>{currentQ < quizQuestions.length - 1 ? 'Soal Selanjutnya' : 'Lihat Hasil'}</span>
+                <ChevronRight className="w-5 h-5" />
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
